@@ -1,6 +1,6 @@
-package Server;
+package server;
 
-import Handler.*;
+import handler.*;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -51,32 +51,8 @@ public class Http2nettyServer {
                 .channel(NioServerSocketChannel.class)
                 .option(ChannelOption.SO_BACKLOG, 100)
                 .handler(new LoggingHandler(LogLevel.DEBUG))
-                .childHandler(new ChannelInitializer<SocketChannel>() {
-                    @Override
-                    protected void initChannel(SocketChannel sc) throws Exception {
-                        ChannelPipeline cp = sc.pipeline();
+                .childHandler(new ServerInitializer(useSsl));
 
-                        /*
-                        * Http2 Connection Create and register frame listener
-                        */
-                        Http2Connection connection = new DefaultHttp2Connection(true);
-                        FrameListener frameListener = new FrameListener();
-                        Http2ConnectionHandler connectionHandler = new Http2ConnectionHandlerBuilder().connection(connection).frameListener(frameListener)
-                                                                                                        //                   .frameLogger("")
-                                                                                                                             .build();
-
-                        if(useSsl){
-                            cp.addLast(new SslContextHandler(certPath,certPassword,sc).getHandler()) ;
-                        }
-
-
-//                        cp.addLast(new Http2ResponseHandler());
-                        /*change to FrameListener in connectionHandler*/
-                        cp.addLast(connectionHandler);
-
-
-                    }
-                });
     }
 
 
@@ -90,11 +66,13 @@ public class Http2nettyServer {
 
             if (cf.isSuccess()) {
                 System.out.println("Server Binding Address =" + cf.channel().localAddress());
+                cf.channel().closeFuture().sync();
             } else {
                 shutdown();
             }
         } catch (InterruptedException e) {
             e.printStackTrace();
+            shutdown();
         }
     }
 
@@ -111,6 +89,7 @@ public class Http2nettyServer {
     public void setUseSsl(Boolean useSsl) {
         this.useSsl = useSsl;
     }
+
     public void setUseSsl(String path, String password, Boolean useSsl) {
         this.certPath = path;
         this.certPassword = password;

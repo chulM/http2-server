@@ -15,6 +15,6 @@ dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
 
     //netty import
-    compile group: 'io.netty', name: 'netty-all', version: '4.1.29.Final'
+    compile group: 'io.netty', name: 'netty-all', version: '4.1.25.Final'
 
 }
