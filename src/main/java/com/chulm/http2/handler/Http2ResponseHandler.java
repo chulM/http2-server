@@ -1,4 +1,4 @@
-package handler;
+package com.chulm.http2.handler;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
@@ -6,6 +6,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.FullHttpMessage;
 import io.netty.handler.codec.http2.*;
 
+//not used
 public class Http2ResponseHandler extends InboundHttp2ToHttpAdapter {
 
 

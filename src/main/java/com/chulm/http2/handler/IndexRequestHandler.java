@@ -1,14 +1,11 @@
-package handler;
+package com.chulm.http2.handler;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPromise;
 import io.netty.handler.codec.http.HttpResponseStatus;
-import io.netty.handler.codec.http2.DefaultHttp2Headers;
-import io.netty.handler.codec.http2.Http2Connection;
-import io.netty.handler.codec.http2.Http2ConnectionEncoder;
-import io.netty.handler.codec.http2.Http2Headers;
+import io.netty.handler.codec.http2.*;
 import io.netty.util.CharsetUtil;
 import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.GenericFutureListener;
@@ -37,10 +34,7 @@ public class IndexRequestHandler extends  AbstractRequestHandler {
     }
 
     @Override
-    public void handleDataFrame(ChannelHandlerContext ctx, int streamId, ByteBuf data, int padding, boolean endOfStream) {
-
-
-
+    public void handleDataFrame(ChannelHandlerContext ctx, int streamId, ByteBuf data, int padding, boolean endOfStream, Http2ConnectionEncoder encoder) {
     }
 
     /**

@@ -1,4 +1,4 @@
-package handler;
+package com.chulm.http2.handler;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
@@ -16,7 +16,7 @@ public class UnknownRequestHandler extends AbstractRequestHandler {
 
     @Override
     public void handleDataFrame(ChannelHandlerContext ctx, int streamId, ByteBuf data, int padding,
-                                boolean endOfStream) {
+                                boolean endOfStream, Http2ConnectionEncoder encoder) {
 
     }
 }

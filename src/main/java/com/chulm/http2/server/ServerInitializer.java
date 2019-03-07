@@ -1,18 +1,14 @@
-package server;
+package com.chulm.http2.server;
 
-import handler.FrameListener;
-import handler.Http2ResponseHandler;
-import handler.SslContextHandler;
-import io.netty.channel.ChannelHandler;
+import com.chulm.http2.handler.FrameListener;
+import com.chulm.http2.handler.SslContextHandler;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.socket.SocketChannel;
-import io.netty.handler.codec.http2.DefaultHttp2Connection;
-import io.netty.handler.codec.http2.Http2Connection;
-import io.netty.handler.codec.http2.Http2ConnectionHandler;
-import io.netty.handler.codec.http2.Http2ConnectionHandlerBuilder;
-import io.netty.handler.codec.http2.Http2FrameLogger;
+import io.netty.handler.codec.http2.*;
 import io.netty.handler.logging.LogLevel;
+import io.netty.handler.ssl.*;
+import io.netty.handler.ssl.util.SelfSignedCertificate;
 
 public class ServerInitializer extends ChannelInitializer<SocketChannel> {
 
@@ -43,9 +39,9 @@ public class ServerInitializer extends ChannelInitializer<SocketChannel> {
         frameListener.setEncoder(connectionHandler.encoder());
 
         if (useSsl) {
-//          cp.addLast(new SslContextHandler(certPath, certPassword, sc).getHandler());
             cp.addLast(SslContextHandler.getSelfSignedSslContext().newHandler(sc.alloc()));
         }
+
         /* change to FrameListener in connectionHandler */
         cp.addLast(connectionHandler);
     }

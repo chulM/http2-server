@@ -1,11 +1,8 @@
-package handler;
+package com.chulm.http2.handler;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http2.*;
-import io.netty.util.CharsetUtil;
-
-import java.nio.charset.Charset;
 
 public class FrameListener extends Http2EventAdapter {
 
@@ -50,8 +47,7 @@ public class FrameListener extends Http2EventAdapter {
 //        ctx.fireChannelRead(frame);
 
         CharSequence path = headers.get(Http2Headers.PseudoHeaderName.PATH.value()).toString();
-        RequestHandler handler =
-                RequestHandlerFactory.getInstance().getRequestHandler(path.toString(), getConnection());
+        RequestHandler handler = RequestHandlerFactory.getInstance().getRequestHandler(path.toString(), getConnection());
         handler.handleHeaderFrame(ctx, streamId, headers, padding, endOfStream, getEncoder());
     }
 

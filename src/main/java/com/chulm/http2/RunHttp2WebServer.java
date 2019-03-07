@@ -1,4 +1,6 @@
-import server.Http2nettyServer;
+package com.chulm.http2;
+
+import com.chulm.http2.server.Http2nettyServer;
 
 public class RunHttp2WebServer {
 
@@ -7,7 +9,6 @@ public class RunHttp2WebServer {
          * Test to Not TLS Server....
          *
          * Use SSl For ...
-         * java -Xbootclasspath/p:/home/{path-to-jar}/alpn-boot.jar -jar server-v0.1-1.0.0.jar
          */
         String host = "localhost";
         int port = 8080;

@@ -1,10 +1,11 @@
-package handler;
+package com.chulm.http2.handler;
 
 
-import route.PathName;
+import com.chulm.http2.route.PathName;
 import io.netty.handler.codec.http2.Http2Connection;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class RequestHandlerFactory {
@@ -12,7 +13,6 @@ public class RequestHandlerFactory {
     private static RequestHandlerFactory SINGLETON = new RequestHandlerFactory();
 
     private Map<String, Class<? extends RequestHandler>> resourceToHandlerMap = new HashMap<>();
-
     private RequestHandlerFactory() {
         initialize();
     }
@@ -23,6 +23,7 @@ public class RequestHandlerFactory {
 
     private void initialize() {
         resourceToHandlerMap.put(PathName.INDEX, IndexRequestHandler.class);
+//        resourceToHandlerMap.put(PathName.TEST, IndexRequestHandler.class);
     }
 
     public RequestHandler getRequestHandler(String requestedPath, Http2Connection connection) {
@@ -43,4 +44,6 @@ public class RequestHandlerFactory {
         handler.setConnection(connection);
         return handler;
     }
+
+
 }

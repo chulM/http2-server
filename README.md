@@ -1,8 +1,25 @@
-# http2-server
-understanding the http2 protocol through netty framework and create a server.
+# netty-http2
+- http2 codec with netty framework
+- jdk 1.8 or Later
+- TLS 1.2 or Later
+
+  
+
+# Demo
+
+### netty-server
+- https://netty.io/4.1/xref/io/netty/example/http2/helloworld/server/package-summary.html
+
+### netty-client
+- https://netty.io/4.1/xref/io/netty/example/http2/helloworld/client/Http2Client.html
+
+### Javascript
+- https://github.com/http2/http2-test
 
 
-##  
-- http and server certificate for https
-- protocol study
-- http2 client
+# reference
+
+- https://http2.github.io/
+- https://hpbn.co/http2/
+- https://tools.ietf.org/html/rfc7540
+- https://developers.google.com/web/fundamentals/performance/http2/    

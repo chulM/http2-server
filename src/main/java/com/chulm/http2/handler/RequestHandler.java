@@ -1,4 +1,4 @@
-package handler;
+package com.chulm.http2.handler;
 
 //우리는 각 클라이언트 요청을 요청의 URL로 처리합니다.
 // 서버 푸시와 서버 푸시를 포함하여 응답 할 두 개의 URL을 정의합니다.
@@ -19,7 +19,7 @@ public interface RequestHandler {
     abstract void handleHeaderFrame(ChannelHandlerContext ctx, int streamId, Http2Headers headers, int padding,
                            boolean endStream, Http2ConnectionEncoder encoder);
 
-    abstract void handleDataFrame(ChannelHandlerContext ctx, int streamId, ByteBuf data, int padding, boolean endOfStream);
+    abstract void handleDataFrame(ChannelHandlerContext ctx, int streamId, ByteBuf data, int padding, boolean endOfStream, Http2ConnectionEncoder encoder);
 
     abstract void setConnection(Http2Connection connection);
 

@@ -1,4 +1,4 @@
-package route;
+package com.chulm.http2.route;
 
 public class PathName {
 

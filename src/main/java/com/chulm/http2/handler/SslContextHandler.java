@@ -1,4 +1,4 @@
-package handler;
+package com.chulm.http2.handler;
 
 import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.codec.http2.Http2SecurityUtil;
