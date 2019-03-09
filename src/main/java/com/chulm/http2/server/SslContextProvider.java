@@ -1,4 +1,4 @@
-package com.chulm.http2.handler;
+package com.chulm.http2.server;
 
 import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.codec.http2.Http2SecurityUtil;
@@ -14,7 +14,7 @@ import java.security.Security;
 import java.security.cert.CertificateException;
 
 
-public class SslContextHandler {
+public class SslContextProvider {
 
     private SslContext sslCtx;
     private SocketChannel sc;
@@ -22,7 +22,7 @@ public class SslContextHandler {
     private String certPath;
     private String certPassword;
 
-    public SslContextHandler(String certPath, String certPassword, SocketChannel sc){
+    public SslContextProvider(String certPath, String certPassword, SocketChannel sc){
         this.certPath = certPath;
         this.certPassword = certPassword;
         this.sc = sc;
@@ -37,9 +37,9 @@ public class SslContextHandler {
     public static SslContext getSelfSignedSslContext() throws SSLException, CertificateException {
 
         SelfSignedCertificate ssc = new SelfSignedCertificate();
-        SslContextBuilder builder = null;
+        io.netty.handler.ssl.SslContextBuilder builder = null;
 
-        builder = SslContextBuilder.forClient().trustManager(InsecureTrustManagerFactory.INSTANCE);
+        builder = io.netty.handler.ssl.SslContextBuilder.forClient().trustManager(InsecureTrustManagerFactory.INSTANCE);
 
         SslContext sslCtx = builder
                 .sslProvider(SslProvider.JDK)
@@ -77,7 +77,7 @@ public class SslContextHandler {
             final KeyManagerFactory kmf = KeyManagerFactory.getInstance(algorithm);
             kmf.init(ks, certPassword.toCharArray());
 
-            sslCtx = SslContextBuilder.forServer(kmf)
+            sslCtx = io.netty.handler.ssl.SslContextBuilder.forServer(kmf)
                     .sslProvider(provider)
                     .ciphers(Http2SecurityUtil.CIPHERS, SupportedCipherSuiteFilter.INSTANCE)
                     .applicationProtocolConfig(new ApplicationProtocolConfig(

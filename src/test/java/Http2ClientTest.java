@@ -1,18 +1,33 @@
+package netty_http2_echo.client;
+
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import io.netty.channel.*;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelOption;
+import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import io.netty.handler.codec.http.*;
-import io.netty.handler.codec.http2.*;
+import io.netty.handler.codec.http.DefaultFullHttpRequest;
+import io.netty.handler.codec.http.DefaultHttpHeaders;
+import io.netty.handler.codec.http.FullHttpRequest;
+import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpMethod;
+import io.netty.handler.codec.http.HttpVersion;
+import io.netty.handler.codec.http2.DefaultHttp2Connection;
+import io.netty.handler.codec.http2.Http2Connection;
+import io.netty.handler.codec.http2.Http2EventAdapter;
+import io.netty.handler.codec.http2.Http2Exception;
+import io.netty.handler.codec.http2.Http2Flags;
+import io.netty.handler.codec.http2.Http2Headers;
+import io.netty.handler.codec.http2.Http2Settings;
+import io.netty.handler.codec.http2.Http2Stream;
+import io.netty.handler.codec.http2.HttpToHttp2ConnectionHandler;
+import io.netty.handler.codec.http2.HttpToHttp2ConnectionHandlerBuilder;
 
-import java.util.concurrent.TimeUnit;
-
-/**
- * @ref https://github.com/skssfo/http2/blob/master/src/main/java/sks/samples/http2/netty/client/Client.java
- */
 public class Http2ClientTest {
     static String host = "localhost";
     static int port = 8080;
@@ -48,7 +63,13 @@ public class Http2ClientTest {
         try {
             ChannelFuture cf = bootstrap.connect(host, port).sync();
 
-            writeByHttp(cf);
+            int sendCount = 1;
+            for(int i = 0; i < sendCount; i++) {
+                writeByHttp(cf);
+                Thread.sleep(10 * 1000);
+            }
+
+
 //            writeByHttp2(cf);
         } catch (InterruptedException e) {
             e.printStackTrace();
@@ -58,7 +79,6 @@ public class Http2ClientTest {
     public static void writeByHttp(ChannelFuture cf) {
 
         HttpHeaders httpHeaders = new DefaultHttpHeaders();
-
 
         FullHttpRequest request = new DefaultFullHttpRequest(
                 HttpVersion.HTTP_1_1,
@@ -71,54 +91,12 @@ public class Http2ClientTest {
 
         cf.channel().writeAndFlush(request);
     }
-
-    public static void writeByHttp2(ChannelFuture cf) {
-
-    }
-
-
-}
-
-
-class SettingsHandler extends SimpleChannelInboundHandler<Http2Settings> {
-
-    private final ChannelPromise promise;
-
-    SettingsHandler(ChannelPromise promise) {
-        this.promise = promise;
-    }
-
-    @Override
-    protected void channelRead0(ChannelHandlerContext ctx, Http2Settings msg) throws Exception {
-        promise.setSuccess();
-        //No need for this handler to be in the chain after the initial settings exchange.
-        ctx.pipeline().remove(this);
-    }
-
-    /**
-     * Wait for settings exchange to complete between the client and server.
-     * @param timeout
-     * @param unit
-     * @throws Exception
-     */
-    public void awaitSettings(long timeout, TimeUnit unit) throws Exception {
-        if (!promise.awaitUninterruptibly(timeout, unit)) {
-            throw new IllegalStateException("Timed out waiting for settings");
-        }
-        if (!promise.isSuccess()) {
-            throw new RuntimeException(promise.cause());
-        }
-        System.err.println("Settings exchange complete");
-    }
 }
 
 class ClientFrameListener extends Http2EventAdapter {
 
-
     @Override
-    public int onDataRead(ChannelHandlerContext ctx, int streamId, ByteBuf data, int padding, boolean endOfStream)
-            throws Http2Exception {
-
+    public int onDataRead(ChannelHandlerContext ctx, int streamId, ByteBuf data, int padding, boolean endOfStream) throws Http2Exception {
         System.out.println("ClientFrameListener.onDataRead()");
 
         int size = data.readableBytes();
@@ -128,29 +106,122 @@ class ClientFrameListener extends Http2EventAdapter {
         String str = new String(byteMessage);
 
         System.out.println("stream ID :" + streamId+ ", data = " + str + ", padding = " + padding + ", endofstream =" + endOfStream);
+
         return super.onDataRead(ctx, streamId, data, padding, endOfStream);
     }
 
     @Override
-    public void onHeadersRead(ChannelHandlerContext ctx, int streamId, Http2Headers headers, int padding,
-                              boolean endStream) throws Http2Exception {
+    public void onGoAwayRead(ChannelHandlerContext ctx, int lastStreamId, long errorCode, ByteBuf debugData) throws Http2Exception {
+        // TODO Auto-generated method stub
+        super.onGoAwayRead(ctx, lastStreamId, errorCode, debugData);
+    }
 
-        System.out.println("ClientFrameListener.onHeadersRead()");
+    @Override
+    public void onGoAwayReceived(int lastStreamId, long errorCode, ByteBuf debugData) {
+        // TODO Auto-generated method stub
+        super.onGoAwayReceived(lastStreamId, errorCode, debugData);
+    }
+
+    @Override
+    public void onGoAwaySent(int lastStreamId, long errorCode, ByteBuf debugData) {
+        // TODO Auto-generated method stub
+        super.onGoAwaySent(lastStreamId, errorCode, debugData);
+    }
+
+    @Override
+    public void onHeadersRead(ChannelHandlerContext ctx, int streamId, Http2Headers headers, int padding, boolean endStream) throws Http2Exception {
+        System.out.println("ClientFrameListener.onHeadersRead() 1");
         super.onHeadersRead(ctx, streamId, headers, padding, endStream);
     }
 
     @Override
-    public void onSettingsRead(ChannelHandlerContext ctx, Http2Settings settings)
-            throws Http2Exception {
-        //save the reference to ChannelHandlerContext
-        ctx.fireChannelRead(settings);
+    public void onHeadersRead(ChannelHandlerContext ctx, int streamId, Http2Headers headers, int streamDependency, short weight, boolean exclusive, int padding, boolean endStream) throws Http2Exception {
+        System.out.println("ClientFrameListener.onHeadersRead() 2");
+        super.onHeadersRead(ctx, streamId, headers, streamDependency, weight, exclusive, padding, endStream);
     }
 
     @Override
-    public void onPushPromiseRead(ChannelHandlerContext ctx, int streamId, int promisedStreamId,
-                                  Http2Headers headers, int padding) throws Http2Exception {
+    public void onPingAckRead(ChannelHandlerContext ctx, long data) throws Http2Exception {
+        // TODO Auto-generated method stub
+        super.onPingAckRead(ctx, data);
+    }
 
-        System.out.println("ClientFrameListener.onHeadersRead()");
+    @Override
+    public void onPingRead(ChannelHandlerContext ctx, long data) throws Http2Exception {
+        // TODO Auto-generated method stub
+        super.onPingRead(ctx, data);
+    }
+
+    @Override
+    public void onPriorityRead(ChannelHandlerContext ctx, int streamId, int streamDependency, short weight, boolean exclusive) throws Http2Exception {
+        // TODO Auto-generated method stub
+        super.onPriorityRead(ctx, streamId, streamDependency, weight, exclusive);
+    }
+
+    @Override
+    public void onPushPromiseRead(ChannelHandlerContext ctx, int streamId, int promisedStreamId, Http2Headers headers, int padding) throws Http2Exception {
+        // TODO Auto-generated method stub
         super.onPushPromiseRead(ctx, streamId, promisedStreamId, headers, padding);
     }
+
+    @Override
+    public void onRstStreamRead(ChannelHandlerContext ctx, int streamId, long errorCode) throws Http2Exception {
+        // TODO Auto-generated method stub
+        super.onRstStreamRead(ctx, streamId, errorCode);
+    }
+
+    @Override
+    public void onSettingsAckRead(ChannelHandlerContext ctx) throws Http2Exception {
+        // TODO Auto-generated method stub
+        super.onSettingsAckRead(ctx);
+    }
+
+    @Override
+    public void onSettingsRead(ChannelHandlerContext ctx, Http2Settings settings) throws Http2Exception {
+        // TODO Auto-generated method stub
+        super.onSettingsRead(ctx, settings);
+    }
+
+    @Override
+    public void onStreamActive(Http2Stream stream) {
+        // TODO Auto-generated method stub
+        super.onStreamActive(stream);
+    }
+
+    @Override
+    public void onStreamAdded(Http2Stream stream) {
+        // TODO Auto-generated method stub
+        super.onStreamAdded(stream);
+    }
+
+    @Override
+    public void onStreamClosed(Http2Stream stream) {
+        // TODO Auto-generated method stub
+        super.onStreamClosed(stream);
+    }
+
+    @Override
+    public void onStreamHalfClosed(Http2Stream stream) {
+        // TODO Auto-generated method stub
+        super.onStreamHalfClosed(stream);
+    }
+
+    @Override
+    public void onStreamRemoved(Http2Stream stream) {
+        // TODO Auto-generated method stub
+        super.onStreamRemoved(stream);
+    }
+
+    @Override
+    public void onUnknownFrame(ChannelHandlerContext ctx, byte frameType, int streamId, Http2Flags flags, ByteBuf payload) throws Http2Exception {
+        // TODO Auto-generated method stub
+        super.onUnknownFrame(ctx, frameType, streamId, flags, payload);
+    }
+
+    @Override
+    public void onWindowUpdateRead(ChannelHandlerContext ctx, int streamId, int windowSizeIncrement) throws Http2Exception {
+        // TODO Auto-generated method stub
+        super.onWindowUpdateRead(ctx, streamId, windowSizeIncrement);
+    }
+
 }
