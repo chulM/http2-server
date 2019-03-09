@@ -1,3 +1,4 @@
+[![dependencies](https://img.shields.io/badge/netty-all-4.1.25-brown.svg)]()
 # netty-http2
 - http2 codec with netty framework
 - jdk 1.8 or Later
