@@ -29,6 +29,8 @@ public class Http2nettyServer {
     private String certPath;
     private String certPassword;
 
+    private Http2ServerInitializer serverInitializer;
+
     public Http2nettyServer(String host, int port) {
         this.host = host;
         this.port = port;
@@ -42,13 +44,14 @@ public class Http2nettyServer {
         childGroup = new NioEventLoopGroup();
 
         serverBootstrap = new ServerBootstrap();
-
+        serverInitializer = new Http2ServerInitializer(useSsl);
 
         serverBootstrap.group(parentGroup, childGroup)
                 .channel(NioServerSocketChannel.class)
-                .option(ChannelOption.SO_BACKLOG, 100)
-                .handler(new LoggingHandler(LogLevel.DEBUG))
-                .childHandler(new ServerInitializer(useSsl));
+                .option(ChannelOption.SO_BACKLOG, 200)
+                .childOption(ChannelOption.SO_KEEPALIVE, true)
+                .handler(new LoggingHandler(LogLevel.INFO))
+                .childHandler(serverInitializer);
 
     }
 
@@ -92,4 +95,6 @@ public class Http2nettyServer {
         this.certPassword = password;
         this.useSsl = useSsl;
     }
+
+
 }

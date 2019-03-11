@@ -1,5 +1,3 @@
-package netty_http2_echo.client;
-
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -41,6 +39,12 @@ public class Http2ClientTest {
         eventLoopGroup = new NioEventLoopGroup(1);
         bootstrap = new Bootstrap();
 
+        final Http2Connection http2Connection = new DefaultHttp2Connection(false);
+        HttpToHttp2ConnectionHandler httpToHttp2ConnectionHandlerBuilder = new HttpToHttp2ConnectionHandlerBuilder()
+                .frameListener(new ClientFrameListener())
+                .connection(http2Connection)
+                .build();
+
         bootstrap.group(eventLoopGroup)
                 .channel(NioSocketChannel.class)
                 .option(ChannelOption.SO_KEEPALIVE, true)
@@ -48,14 +52,6 @@ public class Http2ClientTest {
                 .handler(new ChannelInitializer<SocketChannel>() {
                     @Override
                     protected void initChannel(SocketChannel ch) throws Exception {
-                        final Http2Connection http2Connection = new DefaultHttp2Connection(false);
-                        HttpToHttp2ConnectionHandler httpToHttp2ConnectionHandlerBuilder = new HttpToHttp2ConnectionHandlerBuilder()
-                                .frameListener(new ClientFrameListener())
-                                .connection(http2Connection)
-                                .build();
-
-
-
                         ch.pipeline().addLast(httpToHttp2ConnectionHandlerBuilder);
                     }
                 });
@@ -66,7 +62,7 @@ public class Http2ClientTest {
             int sendCount = 1;
             for(int i = 0; i < sendCount; i++) {
                 writeByHttp(cf);
-                Thread.sleep(10 * 1000);
+                Thread.sleep(1 * 1000);
             }
 
 
@@ -161,6 +157,7 @@ class ClientFrameListener extends Http2EventAdapter {
     @Override
     public void onPushPromiseRead(ChannelHandlerContext ctx, int streamId, int promisedStreamId, Http2Headers headers, int padding) throws Http2Exception {
         // TODO Auto-generated method stub
+        System.err.println("onPushPromiseReads: " + streamId + ", promisedStreamId:" + promisedStreamId);
         super.onPushPromiseRead(ctx, streamId, promisedStreamId, headers, padding);
     }
 

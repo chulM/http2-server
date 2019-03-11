@@ -7,6 +7,16 @@ version '0.0.1-SNAPSHOT'
 
 sourceCompatibility = 1.8
 
+jar {
+    archiveName = 'http2-app.jar'
+    manifest {
+        attributes 'Main-Class': 'com.chulm.http2.RunHttp2WebServer'
+    }
+    dependsOn configurations.runtime
+    from {
+        configurations.compile.collect {it.isDirectory()? it: zipTree(it)}
+    }
+}
 repositories {
     mavenCentral()
 }
