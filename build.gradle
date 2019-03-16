@@ -37,6 +37,7 @@ dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
     //netty import
     compile('io.netty:netty-all:4.1.25.Final')
+    runtime('io.netty:netty-tcnative-boringssl-static:2.0.20.Final')
     testCompile("org.mortbay.jetty.alpn:alpn-boot:${alpnBootVersion}")
 }
 

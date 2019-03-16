@@ -3,4 +3,4 @@ Content-Type: text/html
 
 ###
 
- curl -i --http2 http://localhost:8080
+curl --insecure -i --http2 https://localhost:8081

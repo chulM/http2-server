@@ -53,6 +53,7 @@ public class SslContextProvider {
 //            SelfSignedCertificate ssc = new SelfSignedCertificate();
 
             SslProvider provider = OpenSsl.isAlpnSupported() ? SslProvider.OPENSSL : SslProvider.JDK;
+            System.out.println("openSSl support:" + OpenSsl.isAlpnSupported());
 
             String algorithm = Security.getProperty("ssl.KeyManagerFactory.algorithm");
             if (algorithm == null) {

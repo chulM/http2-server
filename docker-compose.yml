@@ -6,21 +6,13 @@ services:
     image: chulm/http2/app:latest
     environment:
       - JVM_MEMORY=-Xmx4g -Xms4g -XX:MetaspaceSize=200m
-    hostname: http2-app
-    healthcheck:
-      test: ["CMD", "curl", "-i", "--http2", "http://http2-app:8080/"]
-      interval: 5s
-      timeout: 5s
-      retries: 15
-
-  nginx:
-    build: http2-nginx
-    image: chulm/http2/nginx:latest
+    hostname: app
+    container_name: app
     ports:
       - 8080:80
-      - 443:443
-    links:
-      - app:app
-    depends_on:
-      app:
-        condition: service_healthy
+      - 4433:443
+    healthcheck:
+      test: ["CMD", "curl", "--insecure", "https://localhost:443/"]
+      interval: 30s
+      timeout: 5s
+      retries: 10

@@ -1,0 +1,8 @@
+1. Convert our ".jks" file to ".p12" (PKCS12 keystore format):
+keytool -importkeystore -srckeystore { java-keystore.jks } -destkeystore { pkcs12-keystore.p12 } -deststoretype PKCS12
+
+2. Extract pem (certificate) from ".p12" keystore file:
+openssl pkcs12 -nokeys -in { pkcs12-keystore.p12 } -out { certificate-chain.pem }
+
+3. Extract unencrypted key file from ".p12" keystore file:
+openssl pkcs12 -nocerts -nodes -in { pkcs12-keystore.p12 } -out { unencrypted-key.key }

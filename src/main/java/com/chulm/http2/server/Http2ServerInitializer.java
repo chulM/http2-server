@@ -48,7 +48,6 @@ public class Http2ServerInitializer extends ChannelInitializer<SocketChannel> {
 
     @Override
     public void initChannel(SocketChannel ch) {
-
         if (useSsl) {
             configureSsl(ch);
         }else{
