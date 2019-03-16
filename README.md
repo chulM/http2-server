@@ -51,14 +51,18 @@ runtime('io.netty:netty-tcnative-boringssl-static:2.0.20.Final')
 # nginx
 
 - OpenSSL version 1.0.2 부터 HTTP/2 지원
-- browser HTTP/2 req -> nginx HTTP/1.1 req -> myserver
+- nginx proxy does not support backend HTTP/2.(only push on) 
+
+- proxy pass를 위한 http/2 지원에 대한 계획은 없다.
+- http/2의 이점은 단일연결로 많은 요청을 수행할 수 있다는 점이고, nginx 웹서버와 브라우저간의 단일 연결만 지정한다.
+- browser HTTP/2 req -> nginx HTTP/1.1 req (proxy)-> myserver
 
 ```bash
 server {
   listen 443 ssl http2;
   listen [::]:443 ssl http2;
 
-
+    
   ssl_certificate /etc/nginx/conf.d/sample.pem;
   ssl_certificate_key /etc/nginx/conf.d/sample.key;
   ssl_session_timeout 1d;
@@ -66,6 +70,15 @@ server {
   ...
   
  }
+ 
+ 
+  location / {
+    proxy_pass https://localhost:8081/;
+    proxy_redirect off;
+
+    proxy_http_version 1.1;
+    ...
+    }
 ```
 
 ### reference
