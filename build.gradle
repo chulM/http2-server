@@ -1,11 +1,26 @@
+buildscript {
+    ext {
+        alpnAgentVersion  = '2.0.6'
+        alpnBootVersion   = '8.1.12.v20180117'
+    }
+}
+
 plugins {
     id 'java'
+    id 'application'
+    id 'eclipse'
 }
 
 group 'com.chulm.http2'
 version '0.0.1-SNAPSHOT'
+description = "demo-http2"
 
 sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
 
 jar {
     archiveName = 'http2-app.jar'
@@ -17,13 +32,18 @@ jar {
         configurations.compile.collect {it.isDirectory()? it: zipTree(it)}
     }
 }
-repositories {
-    mavenCentral()
-}
 
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
     //netty import
     compile('io.netty:netty-all:4.1.25.Final')
+    testCompile("org.mortbay.jetty.alpn:alpn-boot:${alpnBootVersion}")
+}
 
+test {
+    systemProperty "javax.net.ssl.trustStoreType", "jks"
+    systemProperty "javax.net.ssl.trustStore", "src/main/resources/sample.jks"
+    systemProperty "javax.net.debug", "ssl"
+    systemProperty "javax.net.ssl.trustStorePassword", "changePassword"
+    jvmArgs = ["-Xbootclasspath/p:lib/alpn-boot-${alpnBootVersion}.jar"]
 }

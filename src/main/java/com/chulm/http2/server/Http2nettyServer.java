@@ -15,7 +15,7 @@ import java.net.InetSocketAddress;
 public class Http2nettyServer {
 
     private String host = "localhost";
-    private int port = 20000;
+    private int port = 8080;
 
     private EventLoopGroup parentGroup;
     private EventLoopGroup childGroup;
@@ -26,16 +26,11 @@ public class Http2nettyServer {
 
     private Boolean useSsl = false;
 
-    private String certPath;
-    private String certPassword;
-
     private Http2ServerInitializer serverInitializer;
 
     public Http2nettyServer(String host, int port) {
         this.host = host;
         this.port = port;
-
-        init();
     }
 
     private void init() {
@@ -58,6 +53,7 @@ public class Http2nettyServer {
 
     public void bind() {
 
+        init();
         try {
             cf = serverBootstrap.bind(new InetSocketAddress(host, port)).sync();
 
@@ -89,12 +85,5 @@ public class Http2nettyServer {
     public void setUseSsl(Boolean useSsl) {
         this.useSsl = useSsl;
     }
-
-    public void setUseSsl(String path, String password, Boolean useSsl) {
-        this.certPath = path;
-        this.certPassword = password;
-        this.useSsl = useSsl;
-    }
-
 
 }

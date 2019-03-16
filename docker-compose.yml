@@ -6,8 +6,6 @@ services:
     image: chulm/http2/app:latest
     environment:
       - JVM_MEMORY=-Xmx4g -Xms4g -XX:MetaspaceSize=200m
-    ports:
-      - 8080:8080
     hostname: http2-app
     healthcheck:
       test: ["CMD", "curl", "-i", "--http2", "http://http2-app:8080/"]
@@ -19,7 +17,7 @@ services:
     build: http2-nginx
     image: chulm/http2/nginx:latest
     ports:
-      - 80:80
+      - 8080:80
       - 443:443
     links:
       - app:app

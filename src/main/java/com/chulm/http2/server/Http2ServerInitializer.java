@@ -1,6 +1,5 @@
 package com.chulm.http2.server;
 
-import com.chulm.http2.handler.Http2ConnectionAndFrameHandler;
 import com.chulm.http2.handler.Http2OrHttpHandler;
 import com.chulm.http2.handler.HttpSimpleHandler;
 import com.chulm.http2.handler.MyHttp2HandlerBuilder;
@@ -13,8 +12,6 @@ import io.netty.handler.codec.http.HttpServerUpgradeHandler.UpgradeCodecFactory;
 import io.netty.handler.codec.http2.*;
 import io.netty.util.AsciiString;
 
-import javax.net.ssl.SSLException;
-import java.security.cert.CertificateException;
 
 /**
  * Sets up the Netty pipeline for the example server. Depending on the endpoint config, sets up the
@@ -54,23 +51,25 @@ public class Http2ServerInitializer extends ChannelInitializer<SocketChannel> {
 
         if (useSsl) {
             configureSsl(ch);
-        } else {
+        }else{
             configureClearText(ch);
         }
     }
 
     /**
-     * Configure the pipeline for TLS NPN negotiation to HTTP/2.
+     * Configure the pipeline for TLS ALPN/NPS negotiation to HTTP/2.
      */
     private void configureSsl(SocketChannel ch) {
-        try {
-            ch.pipeline().addLast(SslContextProvider.getSelfSignedSslContext().newHandler(ch.alloc()));
-            ch.pipeline().addLast(new Http2OrHttpHandler());
-        } catch (SSLException e) {
-            e.printStackTrace();
-        } catch (CertificateException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            ch.pipeline().addLast(SslContextProvider.getSelfSignedSslContext().newHandler(ch.alloc()));
+//        } catch (SSLException e) {
+//            e.printStackTrace();
+//        } catch (CertificateException e) {
+//            e.printStackTrace();
+//        }
+        ch.pipeline().addLast(SslContextProvider.createSslContext().newHandler(ch.alloc()));
+        ch.pipeline().addLast(new Http2OrHttpHandler());
+
     }
 
     /**

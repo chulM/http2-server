@@ -54,7 +54,7 @@ public class Http2ConnectionAndFrameHandler extends Http2ConnectionHandler imple
      */
     @Override
     public int onDataRead(ChannelHandlerContext ctx, int streamId, ByteBuf data, int padding, boolean endOfStream) throws Http2Exception {
-        System.err.println("onDataRead()");
+        System.out.println("onDataRead()");
         int processed = data.readableBytes() + padding;
         ByteBuf message = Unpooled.unreleasableBuffer(Unpooled.copiedBuffer("Server Response : Version - HTTP/2", CharsetUtil.UTF_8));
         encoder().writeData(ctx,streamId, message, padding, endOfStream, ctx.newPromise());
@@ -63,65 +63,74 @@ public class Http2ConnectionAndFrameHandler extends Http2ConnectionHandler imple
 
     @Override
     public void onHeadersRead(ChannelHandlerContext ctx, int streamId, Http2Headers headers, int padding, boolean endOfStream) throws Http2Exception {
-        System.err.println("onHeaderReads(2)");
-        Http2Headers responseHeader = new DefaultHttp2Headers().status(OK.codeAsText());
-        encoder().writeHeaders(ctx,streamId,responseHeader,padding, endOfStream, ctx.newPromise());
+        System.out.println("onHeaderReads(2)");
 
+        Http2Headers responseHeader = new DefaultHttp2Headers().status(OK.codeAsText());
+        encoder().writeHeaders(ctx,streamId,responseHeader,padding, false, ctx.newPromise());
+
+        if(headers.path().toString().equalsIgnoreCase("/favicon.ico")){
+            ByteBuf message = Unpooled.unreleasableBuffer(Unpooled.copiedBuffer("NoImages", CharsetUtil.UTF_8));
+            encoder().writeData(ctx,streamId, message, padding, endOfStream, ctx.newPromise());
+        }
+        if(headers.path().toString().equalsIgnoreCase("/")){
+            ByteBuf message = Unpooled.unreleasableBuffer(Unpooled.copiedBuffer("Server Response : Version - HTTP/2", CharsetUtil.UTF_8));
+            encoder().writeData(ctx,streamId, message, padding, endOfStream, ctx.newPromise());
+        }
     }
 
     @Override
     public void onHeadersRead(ChannelHandlerContext ctx, int streamId, Http2Headers headers, int streamDependency, short weight, boolean exclusive, int padding, boolean endOfStream) throws Http2Exception {
-        System.err.println("onHeaderReads(1)");
+        System.out.println("onHeaderReads(1)");
         onHeadersRead(ctx, streamId, headers, padding, endOfStream);
     }
 
     @Override
     public void onPriorityRead(ChannelHandlerContext ctx, int streamId, int streamDependency, short weight, boolean exclusive) throws Http2Exception {
-        System.err.println("onPriorityRead()");
+        System.out.println("onPriorityRead()");
     }
 
     @Override
     public void onRstStreamRead(ChannelHandlerContext ctx, int streamId, long errorCode) throws Http2Exception {
-        System.err.println("onRstStreamRead()");
+        System.out.println("onRstStreamRead()");
     }
 
     @Override
     public void onSettingsAckRead(ChannelHandlerContext ctx) throws Http2Exception {
-        System.err.println("onSettingsAckRead()");
+        System.out.println("onSettingsAckRead()");
     }
 
     @Override
     public void onSettingsRead(ChannelHandlerContext ctx, Http2Settings settings) throws Http2Exception {
-        System.err.println("onSettingsRead()");
+        System.out.println("onSettingsRead()");
     }
 
     @Override
     public void onPingRead(ChannelHandlerContext ctx, long data) throws Http2Exception {
-        System.err.println("onPingRead()");
+        System.out.println("onPingRead()");
     }
 
     @Override
     public void onPingAckRead(ChannelHandlerContext ctx, long data) throws Http2Exception {
-        System.err.println("onPingAckRead()");
+        System.out.println("onPingAckRead()");
     }
 
     @Override
     public void onPushPromiseRead(ChannelHandlerContext ctx, int streamId, int promisedStreamId, Http2Headers headers, int padding) throws Http2Exception {
-        System.err.println("onPushPromiseRead()");
+        System.out.println("onPushPromiseRead()");
     }
 
     @Override
     public void onGoAwayRead(ChannelHandlerContext ctx, int lastStreamId, long errorCode, ByteBuf debugData) throws Http2Exception {
-        System.err.println("onGoAwayRead()");
+        System.out.println("onGoAwayRead()");
     }
 
     @Override
     public void onWindowUpdateRead(ChannelHandlerContext ctx, int streamId, int windowSizeIncrement) throws Http2Exception {
-        System.err.println("onWindowUpdateRead()");
+        System.out.println("onWindowUpdateRead()");
     }
 
     @Override
     public void onUnknownFrame(ChannelHandlerContext ctx, byte frameType, int streamId, Http2Flags flags, ByteBuf payload) throws Http2Exception {
-        System.err.println("onUnknownFrame()");
+        System.out.println("onUnknownFrame()");
     }
 }

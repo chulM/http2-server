@@ -42,11 +42,13 @@ public class HttpResponseHandler extends SimpleChannelInboundHandler<FullHttpReq
 
     @Override
     public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
+        System.out.println("channelReadComplete");
         ctx.flush();
     }
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
+        System.out.println("exceptionCaught");
         cause.printStackTrace();
         ctx.close();
     }

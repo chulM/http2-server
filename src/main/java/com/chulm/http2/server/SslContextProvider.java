@@ -15,38 +15,25 @@ import java.security.cert.CertificateException;
 
 
 public class SslContextProvider {
-
-    private SslContext sslCtx;
     private SocketChannel sc;
-
-    private String certPath;
-    private String certPassword;
-
-    public SslContextProvider(String certPath, String certPassword, SocketChannel sc){
-        this.certPath = certPath;
-        this.certPassword = certPassword;
-        this.sc = sc;
-        createSslContext();
-    }
-    public SslHandler getHandler() {
-        return sslCtx.newHandler(sc.alloc());
-    }
+    private static SslContext sslCtx;
+    private static String certPath;
+    private static String certPassword;
 
 
 
     public static SslContext getSelfSignedSslContext() throws SSLException, CertificateException {
 
-        SelfSignedCertificate ssc = new SelfSignedCertificate();
-        io.netty.handler.ssl.SslContextBuilder builder = null;
-
-        builder = io.netty.handler.ssl.SslContextBuilder.forClient().trustManager(InsecureTrustManagerFactory.INSTANCE);
+        SslContextBuilder builder = SslContextBuilder.forClient()
+                                                     .trustManager(InsecureTrustManagerFactory.INSTANCE);
+        SslProvider provider = OpenSsl.isAlpnSupported() ? SslProvider.OPENSSL : SslProvider.JDK;
 
         SslContext sslCtx = builder
-                .sslProvider(SslProvider.JDK)
+                .sslProvider(provider)
                 .ciphers(Http2SecurityUtil.CIPHERS, SupportedCipherSuiteFilter.INSTANCE)
                 .applicationProtocolConfig(new ApplicationProtocolConfig(
                         ApplicationProtocolConfig.Protocol.ALPN,
-                        ApplicationProtocolConfig.SelectorFailureBehavior.NO_ADVERTISE,
+                        ApplicationProtocolConfig.SelectorFailureBehavior.FATAL_ALERT,
                         ApplicationProtocolConfig.SelectedListenerFailureBehavior.ACCEPT,
                         ApplicationProtocolNames.HTTP_2,
                         ApplicationProtocolNames.HTTP_1_1))
@@ -59,7 +46,7 @@ public class SslContextProvider {
      * Only JKS File
      */
 
-    private void createSslContext() {
+    public static SslContext createSslContext() {
 
         try {
             //SelfSignedCertificate
@@ -77,7 +64,7 @@ public class SslContextProvider {
             final KeyManagerFactory kmf = KeyManagerFactory.getInstance(algorithm);
             kmf.init(ks, certPassword.toCharArray());
 
-            sslCtx = io.netty.handler.ssl.SslContextBuilder.forServer(kmf)
+            sslCtx = SslContextBuilder.forServer(kmf)
                     .sslProvider(provider)
                     .ciphers(Http2SecurityUtil.CIPHERS, SupportedCipherSuiteFilter.INSTANCE)
                     .applicationProtocolConfig(new ApplicationProtocolConfig(
@@ -91,5 +78,14 @@ public class SslContextProvider {
             sslCtx = null;
             e.printStackTrace();
         }
+        return sslCtx;
+    }
+
+    public static void setCertPath(String certPath) {
+        SslContextProvider.certPath = certPath;
+    }
+
+    public static void setCertPassword(String certPassword) {
+        SslContextProvider.certPassword = certPassword;
     }
 }

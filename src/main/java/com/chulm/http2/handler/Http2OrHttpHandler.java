@@ -3,7 +3,6 @@ package com.chulm.http2.handler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpServerCodec;
-import io.netty.handler.codec.http2.Http2MultiplexCodec;
 import io.netty.handler.ssl.ApplicationProtocolNames;
 import io.netty.handler.ssl.ApplicationProtocolNegotiationHandler;
 
@@ -22,7 +21,7 @@ public class Http2OrHttpHandler extends ApplicationProtocolNegotiationHandler {
     @Override
     protected void configurePipeline(ChannelHandlerContext ctx, String protocol) throws Exception {
         if (ApplicationProtocolNames.HTTP_2.equals(protocol)) {
-            ctx.pipeline().addLast();
+            ctx.pipeline().addLast(new MyHttp2HandlerBuilder().build());
             return;
         }
 
@@ -34,5 +33,12 @@ public class Http2OrHttpHandler extends ApplicationProtocolNegotiationHandler {
         }
 
         throw new IllegalStateException("unknown protocol: " + protocol);
+    }
+
+
+    @Override
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+        System.out.println(cause.getCause());
+        super.exceptionCaught(ctx, cause);
     }
 }
