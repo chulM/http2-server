@@ -36,7 +36,7 @@ jvm args : -Xbootclasspath/p:{path}/alpn-boot-${version}.jar
 runtime('io.netty:netty-tcnative-boringssl-static:2.0.20.Final')
 ```
 
-# caution
+# issues
 
 - Web Browser로 접속 시 반드시 https를 사용해야 한다.
 - 따라서 http/2를 지원하려면, https를 반드시 추가해야한다.
