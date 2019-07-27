@@ -43,3 +43,8 @@ hs_err_pid*
 .idea
 out
 *.iml
+
+# cert
+sample.p12
+sample.pem
+sample.key
